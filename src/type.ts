@@ -4,3 +4,7 @@ export interface Editor {
 	path: string,
 	icon?: string
 }
+
+export interface URLSchemeEnhancementSettings {
+  URLSchemes: Editor[];
+}

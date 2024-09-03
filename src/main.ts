@@ -1,9 +1,15 @@
 import { Plugin } from "obsidian";
 import { resolveCommand, resolveEditor, runCommand } from "./command";
 import { Editors } from "./config";
+import { URLSchemeEnhancementSettingTab } from "./setting";
+import { URLSchemeEnhancementSettings } from "./type";
+
 
 export default class URLSchemeEnhancementPlugin extends Plugin {
+	settings: URLSchemeEnhancementSettings;
+
 	async onload() {
+		await this.loadSettings();
 		// a标签点击事件处理
 		this.registerMarkdownPostProcessor((element) => {
 			// 查找 a 标签, 添加事件拦截
@@ -39,6 +45,17 @@ export default class URLSchemeEnhancementPlugin extends Plugin {
 				})
 			})
 		);
+
+		this.addSettingTab(new URLSchemeEnhancementSettingTab(this.app, this));
+	}
+	async loadSettings() {
+		this.settings = {
+			URLSchemes: []
+		};
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
 	}
 
 }
