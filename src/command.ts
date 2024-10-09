@@ -1,5 +1,5 @@
-import { exec } from 'child_process';
-import { Editor } from './type';
+import { exec, spawn } from 'child_process';
+import { Command, Editor } from './type';
 import { Notice } from 'obsidian';
 import { Editors } from './config';
 
@@ -30,7 +30,7 @@ export function resolveParams(url: string, prefix?: string) {
  * @param editor 指定的编辑器
  * @returns 如果指定了 编辑器, 返回不会返回 undefined; 如果未指定, 调用 resolveEditor 解析, 解析为 undefined 则返回 undefined
  */
-export function resolveCommand(url: string, editor?: Editor) {
+export function resolveCommand(url: string, editor?: Editor): Command | undefined {
   if (!editor) {
     editor = resolveEditor(url);
   }
@@ -38,7 +38,10 @@ export function resolveCommand(url: string, editor?: Editor) {
     return undefined;
   }
   const params = resolveParams(url, editor.prefix)
-  return `"${editor.path}" "${params}"`
+  return {
+    command: editor.path,
+    args: [params]
+  };
 }
 
 /**
@@ -59,13 +62,18 @@ export function resolveEditor(url: string) {
  * 执行命令
  * @param command 命令
  */
-export function runCommand(command: string) {
-  console.log('command', command)
-  exec(command, (error) => {
-    if (error) {
-      console.log('执行失败, command: ', command, error)
-      new Notice('打开失败, error: ' + error);
-      return;
-    }
+export function runCommand(command: Command) {
+  console.log('command:', command)
+  const child = spawn(command.command, command.args, {
+    detached: true,
+    stdio: 'ignore'
   })
+  child.unref();
+  // exec(command, (error) => {
+  //   if (error) {
+  //     console.log('执行失败, command: ', command, error)
+  //     new Notice('打开失败, error: ' + error);
+  //     return;
+  //   }
+  // })
 }

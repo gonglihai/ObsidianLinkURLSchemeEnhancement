@@ -6,5 +6,10 @@ export interface Editor {
 }
 
 export interface URLSchemeEnhancementSettings {
-  URLSchemes: Editor[];
+	URLSchemes: Editor[];
+}
+
+export interface Command {
+	command: string,
+	args: string[]
 }
